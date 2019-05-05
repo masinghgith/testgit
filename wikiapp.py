@@ -1,19 +1,21 @@
+# A very simple Flask, Twilio WhatsApp Application for you to get started with...
+
 from flask import Flask, request
-from twilio.twiml.messaging_response import MessagingResponse
 import wikipedia
 import re
+from twilio.twiml.messaging_response import MessagingResponse
 
 app = Flask(__name__)
 
-def wikisearch(word):
+def fromwiki(word):
     ck = re.match("^[a-zA-Z0-9_]+( [a-zA-Z0-9_]+)*$", word)
-    if ck: 
+    if ck:
         wsg='Valid Input'
     else:
         wsg='Invalid Characters'
-        
-    if word.isdigit(): 
-        wsg='Only Numbers Entered'        
+
+    if word.isdigit():
+        wsg='Only Numbers Entered'
     elif len(word) not in range(5,24):
         wsg='Length Out of Range'
 
@@ -30,17 +32,12 @@ def wikisearch(word):
     else:
         return wsg
 
-@app.route("/")
-def hello():
-    return "Hello, World!"
-
-@app.route("/sms", methods=['POST'])
-def sms_reply():
-    # Create reply
-    msg = request.form.get('Body')
-    resp = MessagingResponse()
-    resp.message("MASIBOT: {}".format(wikisearch(msg)))
-    return str(resp)
-
-if __name__ == "__main__":
-    app.run(debug=True)
+@app.route('/sms', methods=["GET", "POST"])
+def wiki_search():
+    if request.method == "POST":
+        msg = request.form.get('Body')
+        resp = MessagingResponse()
+        resp.message("WikiB: {}".format(fromwiki(msg)))
+        return str(resp)
+    else:
+        return 'Hello from Flask!'
